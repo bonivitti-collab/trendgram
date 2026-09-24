@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Trendgram</title>
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#6ae3ff"/>
+      <stop offset="0.5" stop-color="#8a7dff"/>
+      <stop offset="1" stop-color="#ec7bff"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="26" fill="#070d18"/>
+  <path d="M26 83 L49 58 L64 74 L95 37 L102 44 L102 90 L26 90 Z" fill="url(#g)"/>
+  <path d="M31 96 h66" stroke="#dfefff" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+</svg>
