@@ -193,7 +193,7 @@ export default function App() {
     <div className="app-shell">
       <header className="topbar">
         <div className="brand-wrap">
-          <img className="brand-logo" src="/logo.svg" alt="Trendgram" />
+          <img className="brand-logo" src={`${import.meta.env.BASE_URL}logo.svg`} alt="Trendgram" />
         </div>
 
         <div className="header-actions">
