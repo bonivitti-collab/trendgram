@@ -22,6 +22,40 @@ const categories: { id: Category; label: string }[] = [{ id: 'all', label: 'Todo
 function nextAnalysis() { const date = new Date(); date.setHours(19, 0, 0, 0); if (date.getTime() <= Date.now()) date.setDate(date.getDate() + 1); return date; }
 function countdown(ms: number) { const total = Math.max(0, Math.floor(ms / 1000)); return `${String(Math.floor(total / 3600)).padStart(2, '0')}:${String(Math.floor((total % 3600) / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`; }
 function confidence(value: Opportunity['confidence']) { return value === 'alta' ? 'Alta' : value === 'média' ? 'Média' : 'Contexto'; }
+function opportunityText(item: Opportunity) {
+  return [
+    item.title,
+    item.subtitle,
+    `Data: ${item.date} | Categoria: ${item.category} | Fonte: ${item.source}`,
+    '',
+    'O que foi encontrado',
+    item.evidence,
+    '',
+    'Por que pode ser oportunidade',
+    item.thesis,
+    '',
+    'Por que agora',
+    item.whyNow,
+    '',
+    'O que pode invalidar',
+    item.risks,
+    '',
+    `Documento original: ${item.sourceUrl}`
+  ].join('\n');
+}
+function copyOpportunity(item: Opportunity) {
+  const text = opportunityText(item);
+  if (navigator.clipboard) return navigator.clipboard.writeText(text);
+  const area = document.createElement('textarea');
+  area.value = text;
+  area.style.position = 'fixed';
+  area.style.opacity = '0';
+  document.body.appendChild(area);
+  area.select();
+  document.execCommand('copy');
+  area.remove();
+  return Promise.resolve();
+}
 function AssetLogos({ logos, className }: { logos: AssetLogo[]; className: string }) {
   return <div className={`${className} ${logos.length > 1 ? 'multiple' : 'single'}`}>{logos.map((logo) => <img key={logo.symbol} src={officialLogo(logo.symbol)} alt={`Logo da ${logo.name}`} title={logo.name} loading="eager" decoding="async" onError={(event) => { event.currentTarget.style.display = 'none'; }} />)}</div>;
 }
@@ -38,7 +72,7 @@ export default function App() {
   useEffect(() => { const timer = window.setInterval(() => { const value = Date.now(); setNow(value); if (value >= next.getTime()) setNext(nextAnalysis()); }, 1000); return () => window.clearInterval(timer); }, [next]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [openId]);
 
-  if (selected) return <div className="app-shell detail-shell"><Header now={now} next={next} /><main className="detail-page"><button className="back-button" type="button" onClick={() => setOpenId(null)}><span>←</span> Voltar para oportunidades</button><section className="detail-hero"><div className="detail-asset"><AssetLogos logos={selected.logos} className="detail-logo-list" /><span>{selected.asset}</span></div><div className="detail-hero-copy"><div className="badge-row"><span className="status-dot" /><span>{selected.badge}</span><span className="tag">{confidence(selected.confidence)}</span></div><h1>{selected.title}</h1><p>{selected.subtitle}</p></div></section><section className="detail-metrics"><div><span>Data do evento</span><strong>{selected.date}</strong></div><div><span>Categoria</span><strong>{selected.category}</strong></div><div><span>Origem</span><strong>{selected.source}</strong></div></section><section className="detail-grid"><article className="detail-card evidence-card"><p className="eyebrow">01 · evidência</p><h2>O que foi encontrado</h2><p>{selected.evidence}</p></article><article className="detail-card thesis-card"><p className="eyebrow">02 · tese</p><h2>Por que pode ser oportunidade</h2><p>{selected.thesis}</p></article><article className="detail-card timing-card"><p className="eyebrow">03 · momento</p><h2>Por que agora</h2><p>{selected.whyNow}</p></article><article className="detail-card risk-card"><p className="eyebrow">04 · riscos</p><h2>O que pode invalidar</h2><p>{selected.risks}</p></article></section><section className="detail-footer"><div><p className="eyebrow">diligência</p><h2>Confirmação no documento primário</h2><p>Esta página organiza a hipótese. Antes de tomar qualquer decisão, confirme data, notas, titularidade, código da transação e contexto no documento original.</p></div><a className="source-link" href={selected.sourceUrl} target="_blank" rel="noreferrer">Abrir {selected.source} <span>↗</span></a></section></main></div>;
+  if (selected) return <div className="app-shell detail-shell"><Header now={now} next={next} /><main className="detail-page"><div className="detail-actions"><button className="back-button" type="button" onClick={() => setOpenId(null)}><span>←</span> Voltar para oportunidades</button><div className="export-actions"><button className="export-button" type="button" onClick={() => window.print()}>Salvar PDF</button><button className="export-button" type="button" onClick={() => { void copyOpportunity(selected).then(() => window.open('https://docs.google.com/document/u/0/', '_blank', 'noopener,noreferrer')); }}>Copiar para Google Docs</button></div></div><section className="detail-hero"><div className="detail-asset"><AssetLogos logos={selected.logos} className="detail-logo-list" /><span>{selected.asset}</span></div><div className="detail-hero-copy"><div className="badge-row"><span className="status-dot" /><span>{selected.badge}</span><span className="tag">{confidence(selected.confidence)}</span></div><h1>{selected.title}</h1><p>{selected.subtitle}</p></div></section><section className="detail-metrics"><div><span>Data do evento</span><strong>{selected.date}</strong></div><div><span>Categoria</span><strong>{selected.category}</strong></div><div><span>Origem</span><strong>{selected.source}</strong></div></section><section className="detail-grid"><article className="detail-card evidence-card"><p className="eyebrow">01 · evidência</p><h2>O que foi encontrado</h2><p>{selected.evidence}</p></article><article className="detail-card thesis-card"><p className="eyebrow">02 · tese</p><h2>Por que pode ser oportunidade</h2><p>{selected.thesis}</p></article><article className="detail-card timing-card"><p className="eyebrow">03 · momento</p><h2>Por que agora</h2><p>{selected.whyNow}</p></article><article className="detail-card risk-card"><p className="eyebrow">04 · riscos</p><h2>O que pode invalidar</h2><p>{selected.risks}</p></article></section><section className="detail-footer"><div><p className="eyebrow">diligência</p><h2>Confirmação no documento primário</h2><p>Esta página organiza a hipótese. Antes de tomar qualquer decisão, confirme data, notas, titularidade, código da transação e contexto no documento original.</p></div><a className="source-link" href={selected.sourceUrl} target="_blank" rel="noreferrer">Abrir {selected.source} <span>↗</span></a></section></main></div>;
 
   return <div className="app-shell"><Header now={now} next={next} /><main className="feed-panel feed-page"><div className="feed-header"><div><p className="eyebrow">research feed</p><h2>Oportunidades encontradas</h2></div><span className="live-pill">FONTES OFICIAIS</span></div><div className="quote-status"><span className="status-dot" />Evidências específicas · análise diária às 19h</div><div className="filters">{categories.map((item) => <button key={item.id} type="button" className={item.id === category ? 'filter active' : 'filter'} onClick={() => setCategory(item.id)}>{item.label}</button>)}</div><div className="opportunity-grid">{visible.map((item) => <button key={item.id} type="button" className="post opportunity-card" onClick={() => setOpenId(item.id)}><div className="post-topline"><div className="avatar"><AssetLogos logos={item.logos} className="card-logo-list" /><span className="ticker-fallback">{item.asset.slice(0, 2)}</span></div><div className="post-meta"><div className="line-1"><strong>{item.asset}</strong><span className="tag">{confidence(item.confidence)}</span></div><span className="market-name">{item.badge} · {item.date}</span></div><span className="card-arrow">↗</span></div><div className="post-copy"><h3>{item.title}</h3><p>{item.subtitle}</p></div><div className="trade-strip"><span>Tipo<strong>{item.category === 'macro' ? 'Ciclo' : 'Evento'}</strong></span><span>Fonte<strong>Primária</strong></span><span>Abrir<strong>Detalhes</strong></span></div></button>)}</div></main></div>;
 }
