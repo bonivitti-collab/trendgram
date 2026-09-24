@@ -1,9 +1,50 @@
 import { useEffect, useMemo, useState } from 'react';
 
 type AssetClass = 'SP500' | 'NASDAQ100' | 'B3' | 'Cripto' | 'Forex';
-type Opportunity = { id: string; symbol: string; assetClass: AssetClass; title: string; subtitle: string; direction: 'long' | 'short'; setup: string; thesis: string; why: string; how: string; entry: number; stop: number; target: number; riskPercent: number; winRate: number; profitFactor: number; allocation: number; tag: string; market: string; live?: boolean; updatedAt?: string };
 
-type QuoteConfig = { yahoo: string; assetClass: AssetClass; symbol: string; market: string; direction: 'long' | 'short'; title: string; subtitle: string; setup: string; thesis: string; why: string; how: string; riskPercent: number; winRate: number; profitFactor: number; allocation: number; tag: string };
+type Opportunity = {
+  id: string;
+  symbol: string;
+  assetClass: AssetClass;
+  title: string;
+  subtitle: string;
+  direction: 'long' | 'short';
+  setup: string;
+  thesis: string;
+  why: string;
+  how: string;
+  entry: number;
+  stop: number;
+  target: number;
+  riskPercent: number;
+  winRate: number;
+  profitFactor: number;
+  allocation: number;
+  tag: string;
+  market: string;
+  live?: boolean;
+  updatedAt?: string;
+};
+
+type QuoteConfig = {
+  id: string;
+  yahoo: string;
+  assetClass: AssetClass;
+  symbol: string;
+  market: string;
+  direction: 'long' | 'short';
+  title: string;
+  subtitle: string;
+  setup: string;
+  thesis: string;
+  why: string;
+  how: string;
+  riskPercent: number;
+  winRate: number;
+  profitFactor: number;
+  allocation: number;
+  tag: string;
+};
 
 const quoteConfigs: QuoteConfig[] = [
   { id: 'spx-gaps', yahoo: '^GSPC', symbol: 'SPX', assetClass: 'SP500', market: 'US Market', direction: 'long', title: 'Distorção de retorno em SPX', subtitle: 'Pullback curto com proteção no VWAP', setup: 'Preço real do índice com entrada calculada pela estrutura de tendência', thesis: 'A leitura usa a cotação atual do S&P 500 e recalcula a faixa operacional a cada atualização.', why: 'O preço de entrada deixa de ser estático e acompanha o mercado consultado.', how: 'Aguarde confirmação da estrutura antes de operar. Níveis são educacionais e não recomendação financeira.', riskPercent: .8, winRate: 63, profitFactor: 2.4, allocation: 18, tag: 'Trend' },
@@ -15,14 +56,11 @@ const quoteConfigs: QuoteConfig[] = [
 
 const categories = ['all', 'SP500', 'NASDAQ100', 'B3', 'Cripto', 'Forex'] as const;
 type Category = (typeof categories)[number];
-
 const fallbackPrices: Record<string, number> = { '^GSPC': 5565, '^NDX': 488.4, '^BVSP': 118950, 'BTC-USD': 63480, 'EURUSD=X': 1.1018 };
 
 function makeOpportunity(config: QuoteConfig, price: number, updatedAt?: string): Opportunity {
   const long = config.direction === 'long';
-  const stop = long ? price * .98 : price * 1.01;
-  const target = long ? price * 1.04 : price * .982;
-  return { ...config, entry: price, stop, target, live: Boolean(updatedAt), updatedAt };
+  return { id: config.id, symbol: config.symbol, assetClass: config.assetClass, title: config.title, subtitle: config.subtitle, direction: config.direction, setup: config.setup, thesis: config.thesis, why: config.why, how: config.how, entry: price, stop: long ? price * .98 : price * 1.01, target: long ? price * 1.04 : price * .982, riskPercent: config.riskPercent, winRate: config.winRate, profitFactor: config.profitFactor, allocation: config.allocation, tag: config.tag, market: config.market, live: Boolean(updatedAt), updatedAt };
 }
 
 async function fetchQuote(config: QuoteConfig): Promise<{ price: number; updatedAt: string } | null> {
@@ -31,7 +69,9 @@ async function fetchQuote(config: QuoteConfig): Promise<{ price: number; updated
     if (!response.ok) throw new Error('Quote request failed');
     const payload = await response.json();
     const result = payload?.chart?.result?.[0];
-    const price = Number(result?.meta?.regularMarketPrice ?? result?.indicators?.quote?.[0]?.close?.filter(Boolean).at(-1));
+    const closes: unknown[] = result?.indicators?.quote?.[0]?.close ?? [];
+    const latestClose = [...closes].reverse().find((value): value is number => typeof value === 'number' && Number.isFinite(value));
+    const price = Number(result?.meta?.regularMarketPrice ?? latestClose);
     if (!Number.isFinite(price) || price <= 0) throw new Error('Invalid quote');
     return { price, updatedAt: new Date().toISOString() };
   } catch {
@@ -60,10 +100,9 @@ export default function App() {
   const refreshQuotes = async () => {
     setLoading(true);
     const results = await Promise.all(quoteConfigs.map(fetchQuote));
-    const next = quoteConfigs.map((config, index) => makeOpportunity(config, results[index]?.price ?? fallbackPrices[config.yahoo], results[index]?.updatedAt));
-    setOpportunities(next);
-    const fresh = results.find(Boolean);
-    if (fresh) setLastUpdated(fresh.updatedAt);
+    setOpportunities(quoteConfigs.map((config, index) => makeOpportunity(config, results[index]?.price ?? fallbackPrices[config.yahoo], results[index]?.updatedAt)));
+    const latest = results.find((result): result is { price: number; updatedAt: string } => result !== null);
+    if (latest) setLastUpdated(latest.updatedAt);
     setLoading(false);
   };
 
