@@ -1,13 +1,29 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">Trendgram</title>
+  <desc id="desc">Símbolo abstrato de tendência, dados e arbitragem</desc>
   <defs>
-    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-      <stop stop-color="#6ae3ff"/>
-      <stop offset="0.5" stop-color="#8a7dff"/>
-      <stop offset="1" stop-color="#ec7bff"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#62e7ff"/>
+      <stop offset="0.48" stop-color="#777cff"/>
+      <stop offset="1" stop-color="#f17bd2"/>
     </linearGradient>
+    <linearGradient id="line" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#bff7ff"/>
+      <stop offset="1" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
-  <rect width="128" height="128" rx="26" fill="#070d18"/>
-  <path d="M26 83 L49 58 L64 74 L95 37 L102 44 L102 90 L26 90 Z" fill="url(#g)"/>
-  <path d="M31 96 h66" stroke="#dfefff" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+  <rect width="512" height="512" rx="128" fill="#070d18"/>
+  <rect x="28" y="28" width="456" height="456" rx="108" fill="url(#bg)" opacity="0.96"/>
+  <path d="M28 350c82-54 116-12 177-69 65-61 82-128 173-91 45 18 72 8 106-17v311H28z" fill="#081323" opacity=".42"/>
+  <path d="M105 332 184 247l63 47 127-137" fill="none" stroke="#07111f" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" opacity=".35"/>
+  <path d="M105 306 184 221l63 47 127-137" fill="none" stroke="url(#line)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)"/>
+  <circle cx="105" cy="306" r="16" fill="#fff"/>
+  <circle cx="184" cy="221" r="16" fill="#fff"/>
+  <circle cx="247" cy="268" r="16" fill="#fff"/>
+  <circle cx="374" cy="131" r="16" fill="#fff"/>
+  <path d="M104 390h272" stroke="#fff" stroke-width="14" stroke-linecap="round" opacity=".78"/>
 </svg>
