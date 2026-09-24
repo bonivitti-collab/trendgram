@@ -193,11 +193,7 @@ export default function App() {
     <div className="app-shell">
       <header className="topbar">
         <div className="brand-wrap">
-          <div className="brand-mark">T</div>
-          <div>
-            <p className="eyebrow">laboratory</p>
-            <h1>trendgram</h1>
-          </div>
+          <img className="brand-logo" src="/logo.svg" alt="Trendgram" />
         </div>
 
         <div className="header-actions">
