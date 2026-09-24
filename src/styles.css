@@ -45,6 +45,10 @@ body { min-height: 100vh; } button { font: inherit; cursor: pointer; } h1, h2, h
 .trade-strip strong { color: #f1dfac; font-size: .82rem; }
 
 .detail-page { max-width: 1120px; margin: 28px auto 0; }
+.detail-actions { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.export-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.export-button { padding: 11px 15px; border: 1px solid rgba(218,184,92,.28); border-radius: 999px; background: rgba(216,178,75,.12); color: #f5f1e8; }
+.export-button:hover { border-color: #d9b75f; background: rgba(214,177,78,.2); color: #f4d98e; }
 .back-button { display: inline-flex; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid rgba(218,184,92,.28); border-radius: 999px; background: rgba(255,255,255,.035); color: #f5f1e8; }
 .back-button:hover { border-color: #d9b75f; background: rgba(214,177,78,.1); }
 .back-button span { color: #dfc477; font-size: 1.25rem; }
@@ -95,4 +99,18 @@ body { min-height: 100vh; } button { font: inherit; cursor: pointer; } h1, h2, h
   .live-pill { margin-left: auto; font-size: .67rem; }
   .detail-hero { padding: 20px; }
   .detail-card { padding: 20px; }
+  .detail-actions { align-items: flex-start; flex-direction: column; }
+  .export-actions { justify-content: flex-start; }
+}
+
+@media print {
+  :root, html, body, #root { background: #fff !important; color: #111 !important; }
+  .app-shell { max-width: none; padding: 0; }
+  .topbar, .detail-actions, .source-link { display: none !important; }
+  .detail-page { max-width: none; margin: 0; }
+  .detail-hero, .detail-metrics div, .detail-card, .detail-footer { border-color: #d5d5d5; background: #fff; color: #111; box-shadow: none; }
+  .detail-hero h1, .detail-card h2, .detail-metrics strong, .detail-footer h2 { color: #111; }
+  .detail-hero-copy > p, .detail-card p, .detail-footer p { color: #333; }
+  .detail-asset { background: #f4f4f4; color: #111; }
+  .detail-logo-list img { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }
